@@ -1,24 +1,24 @@
 library(survival)
 data(cancer)
 help(cancer)
-#Obtenemos la submuestra de menores de 55 a駉s
+#Obtenemos la submuestra de menores de 55 a帽os
 datos<-cancer[rowSums(is.na(cancer))==0,]
-#Tenemos que ordenar por tiempo para realizar el an醠isis correctamente
+#Tenemos que ordenar por tiempo para realizar el an谩lisis correctamente
 datos<-datos[order(datos$time),]
 funcion_supervivencia<-survfit(Surv(datos$time,datos$status)~1)
-plot(funcion_supervivencia,xlab = "t",ylab="S(t)",main="Funci髇 de Supervivencia")
+plot(funcion_supervivencia,xlab = "t",ylab="S(t)",main="Funci贸n de Supervivencia")
 
-#Hacemos el c醠culo manual para observar que sale igual
+#Hacemos el c谩lculo manual para observar que sale igual
 tiempo<-datos$time[datos$status==2]
 S<-funcion_supervivencia$surv[datos$status==2]
 F<-1-S
-plot(tiempo,F,type="s",xlab = "t",ylab="F(t)",main="Funci髇 de Distribuci髇")#type="s" la hace escalonada
+plot(tiempo,F,type="s",xlab = "t",ylab="F(t)",main="Funci贸n de Distribuci贸n")#type="s" la hace escalonada
 
 f<-(c(F,0)-c(0,F))[-(length(F)+1)]
-plot(tiempo,f,cex=0.7,xlab = "t",ylab="f(t)",main="Funci髇 de Densidad")
+plot(tiempo,f,cex=0.7,xlab = "t",ylab="f(t)",main="Funci贸n de Densidad")
 
 h<-f/S
-plot(tiempo,h,cex=0.7,xlab = "t",ylab="h(t)",main="Funci髇 de Riesgo")
+plot(tiempo,h,cex=0.7,xlab = "t",ylab="h(t)",main="Funci贸n de Riesgo")
 round(h,2)
 
 
@@ -26,7 +26,7 @@ round(h,2)
 cox<-coxph(formula = Surv(datos$time, datos$status==2) ~., data = datos)
 summary(cox)
 
-#Modelo de cox para las variables significativas 鷑icamente
+#Modelo de cox para las variables significativas 煤nicamente
 cox2<-coxph(formula = Surv(datos$time, datos$status==2) ~inst+sex+ph.ecog+ph.karno+wt.loss, data = datos)
 summary(cox2)
 
@@ -36,7 +36,7 @@ test.cox
 test.cox2<-cox.zph(cox2)
 test.cox2
 
-#Gr醘icos con los residuos Schoenfeld para validar la hip髏esis de RP
+#Gr谩ficos con los residuos Schoenfeld para validar la hip贸tesis de RP
 x11()
 par(mfrow=c(3,3))
 plot(test.cox)
@@ -44,7 +44,7 @@ x11()
 par(mfrow=c(3,3))
 plot(test.cox2)
 
-#------An醠isis de Residuos con el modelo completo-----------
+#------An谩lisis de Residuos con el modelo completo-----------
 
 #Residuos Martingala
 scatter.smooth(datos$time, residuals(cox,type="martingale"),xlab="Tiempo",ylab="Residuos",main="Residuos Martingala")
@@ -53,7 +53,7 @@ sum(residuals(cox,type="martingale"))
 
 #Residuos Deviance
 #Utiles para determinar la existencia de Outliers
-#Como se acerca a una aproximaci髇 Gaussiana, consideraremos outliers valores 
+#Como se acerca a una aproximaci贸n Gaussiana, consideraremos outliers valores 
 #fuera de [-3,3] incluso de [-2.5,2.5] que en este caso sucede para 
 #la primera observacion
 resids.dev<-residuals(cox,type="deviance")
@@ -64,10 +64,10 @@ abline(h=2.45,col="red")
 #Podemos observar diferencias
 summary(datos[,c("time","ph.ecog", "ph.karno", "pat.karno", "meal.cal", "wt.loss" )])
 cbind(resids.dev,datos[,c("time","ph.ecog", "ph.karno", "pat.karno", "meal.cal", "wt.loss" )] )[ abs(resids.dev) >= 2.4, ]
-#Valores de ph.ecog y ph.karno buen韘imos y sin embargo muerte prematura
+#Valores de ph.ecog y ph.karno buen铆simos y sin embargo muerte prematura
 
 #Residuos Score
-#Utiles para validar la hip髏esis de RP
+#Utiles para validar la hip贸tesis de RP
 resids.score<-residuals(cox,type="score")
 #Plots Score junto con las etiquetas para los puntos influyentes
 plot(datos[,1],resids.score[,1],xlab ="Inst",ylab="Residuos Score",main="ResScore*Inst")
@@ -93,5 +93,5 @@ which.min(resids.score[,8]) #163
 which.max(resids.score[,8]) #68
 
 #Residuos Schoenfeld
-#Utiles para validar la hip髏esis de RP
+#Utiles para validar la hip贸tesis de RP
 resids.scho<-residuals(cox,type="schoenfeld")
